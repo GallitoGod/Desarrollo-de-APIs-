@@ -1,10 +1,31 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from .models import Categoria, Anuncio
 from .serializers import CategoriaSerializer, AnuncioSerializer
 from apps.usuario.models import Usuario
+
+class CategoriaListaGenericView(ListCreateAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaDetalleGenericView(RetrieveUpdateDestroyAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaViewSet(viewsets.ModelViewSet):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+
+
+class AnuncioViewSet(viewsets.ModelViewSet):
+    queryset = Anuncio.objects.all()
+    serializer_class = AnuncioSerializer
+
 
 
 class CategoriaListaAPIView(APIView):
