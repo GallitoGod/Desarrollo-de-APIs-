@@ -5,6 +5,8 @@ from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIV
 from .models import Categoria, Anuncio
 from .serializers import CategoriaSerializer, AnuncioSerializer
 from apps.usuario.models import Usuario
+from rest_framework.decorators import action
+from django.utils import timezone
 
 class CategoriaListaGenericView(ListCreateAPIView):
     queryset = Categoria.objects.all()
@@ -25,6 +27,42 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 class AnuncioViewSet(viewsets.ModelViewSet):
     queryset = Anuncio.objects.all()
     serializer_class = AnuncioSerializer
+
+    def perform_create(self, serializer):
+        usuario_defecto = Usuario.objects.first()
+        serializer.save(publicado_por=usuario_defecto)
+
+    # 2. Acción personalizada para ver el tiempo restante
+    @action(detail=True, methods=['get'])
+    def tiempo_restante(self, request, pk=None):
+        anuncio = self.get_object()
+
+        if not anuncio.fecha_fin:
+            return Response({"mensaje": "Este anuncio no tiene una fecha de finalización definida."}, status=200)
+
+        ahora = timezone.now()
+        tiempo_restante = anuncio.fecha_fin - ahora
+
+        if tiempo_restante.total_seconds() <= 0:
+            return Response({
+                "estado": "Finalizado",
+                "tiempo_restante": "0 días, 0 horas, 0 minutos"
+            })
+
+        dias = tiempo_restante.days
+        segundos = tiempo_restante.seconds
+        horas = segundos // 3600
+        minutos = (segundos % 3600) // 60
+
+        return Response({
+            "estado": "Activo",
+            "tiempo_restante_texto": f"{dias} días, {horas} horas, {minutos} minutos",
+            "detalle": {
+                "dias": dias,
+                "horas": horas,
+                "minutos": minutos
+            }
+        })
 
 
 
