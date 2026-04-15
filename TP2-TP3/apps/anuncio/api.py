@@ -32,7 +32,6 @@ class AnuncioViewSet(viewsets.ModelViewSet):
         usuario_defecto = Usuario.objects.first()
         serializer.save(publicado_por=usuario_defecto)
 
-    # 2. Acción personalizada para ver el tiempo restante
     @action(detail=True, methods=['get'])
     def tiempo_restante(self, request, pk=None):
         anuncio = self.get_object()
