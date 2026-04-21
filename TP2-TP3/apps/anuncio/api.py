@@ -1,4 +1,4 @@
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIView, ListCreateAPIView
@@ -7,6 +7,8 @@ from .serializers import CategoriaSerializer, AnuncioSerializer
 from apps.usuario.models import Usuario
 from rest_framework.decorators import action
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import CategoriaFilter, AnuncioFilter
 
 class CategoriaListaGenericView(ListCreateAPIView):
     queryset = Categoria.objects.all()
@@ -18,15 +20,23 @@ class CategoriaDetalleGenericView(RetrieveUpdateDestroyAPIView):
     serializer_class = CategoriaSerializer
 
 
+
+
+#     --------        ViewSets     -------------
+
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CategoriaFilter
 
 
 
 class AnuncioViewSet(viewsets.ModelViewSet):
     queryset = Anuncio.objects.all()
     serializer_class = AnuncioSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AnuncioFilter
 
     def perform_create(self, serializer):
         usuario_defecto = Usuario.objects.first()
@@ -62,6 +72,16 @@ class AnuncioViewSet(viewsets.ModelViewSet):
                 "minutos": minutos
             }
         })
+
+
+
+
+
+
+
+# ------------ APIVIEW --------------------
+
+
 
 
 

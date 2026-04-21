@@ -11,6 +11,17 @@ class CategoriaSerializer(serializers.ModelSerializer):
             'activa',
         ]
 
+    def validate_nombre(self, value):
+        if len(value) < 3:
+            raise serializers.ValidationError("El nombre de la categoría es muy corto")
+        return value
+    
+    # No desactivar la principal
+    def validate(self, data):
+        if 'principal' in data['nombre'].lower() and not data['activa']:
+            raise serializers.ValidationError("No se puede desactivar la Categoria principal")
+        return data
+
 
 
 
@@ -25,6 +36,9 @@ class AnuncioSerializer(serializers.ModelSerializer):
             'categorias', 'publicado_por', 'oferta_ganadora'
         ]
         read_only_fields = ['publicado_por', 'oferta_ganadora']
+
+
+
 
     def validate_fecha_inicio(self, value):
         if value < timezone.now():
