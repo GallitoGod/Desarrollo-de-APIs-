@@ -57,3 +57,4 @@ class AnuncioSerializer(serializers.ModelSerializer):
         if fecha_inicio and fecha_fin:
             if fecha_fin <= fecha_inicio:
                 raise serializers.ValidationError({"fecha_fin": "La fecha de finalización debe ser posterior a la fecha de inicio"})
+        return data
