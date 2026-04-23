@@ -135,4 +135,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_VERSIONING_CLASS':
+        'rest_framework.versioning.URLPathVersioning',
+        'DEFAULT_VERSION': 'v1',
+        'ALLOWED_VERSIONS': ['v1', 'v2'],
 }

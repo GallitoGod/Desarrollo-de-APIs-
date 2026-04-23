@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from .models import Categoria, Anuncio
-from .serializers import CategoriaSerializer, AnuncioSerializer
+from .serializers import CategoriaSerializer, AnuncioSerializer, CategoriaV2Serializer
 from apps.usuario.models import Usuario
 from rest_framework.decorators import action
 from django.utils import timezone
@@ -31,8 +31,12 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CategoriaFilter
     ordering_fields = ['nombre', 'activa']
+    pagination_class = StandardResultsSetPagination
 
-
+    def get_serializer_class(self):
+        if self.request.version == 'v2':
+            return CategoriaV2Serializer 
+        return CategoriaSerializer
 
 
 class AnuncioViewSet(viewsets.ModelViewSet):

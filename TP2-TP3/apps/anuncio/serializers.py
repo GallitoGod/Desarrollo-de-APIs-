@@ -16,7 +16,6 @@ class CategoriaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El nombre de la categoría es muy corto")
         return value
     
-    # No desactivar la principal
     def validate(self, data):
         if 'principal' in data['nombre'].lower() and not data['activa']:
             raise serializers.ValidationError("No se puede desactivar la Categoria principal")
@@ -58,3 +57,12 @@ class AnuncioSerializer(serializers.ModelSerializer):
             if fecha_fin <= fecha_inicio:
                 raise serializers.ValidationError({"fecha_fin": "La fecha de finalización debe ser posterior a la fecha de inicio"})
         return data
+    
+
+class CategoriaV2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = [
+            'id',
+            'nombre',
+        ]
