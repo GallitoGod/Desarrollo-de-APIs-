@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import CategoriaFilter, AnuncioFilter
+from .pagination import StandardResultsSetPagination
 
 class CategoriaListaGenericView(ListCreateAPIView):
     queryset = Categoria.objects.all()
@@ -29,6 +30,8 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CategoriaFilter
+    ordering_fields = ['nombre', 'activa']
+
 
 
 
@@ -37,6 +40,9 @@ class AnuncioViewSet(viewsets.ModelViewSet):
     serializer_class = AnuncioSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AnuncioFilter
+    ordering_fields = ['titulo']
+    pagination_class = StandardResultsSetPagination
+
 
     def perform_create(self, serializer):
         usuario_defecto = Usuario.objects.first()
