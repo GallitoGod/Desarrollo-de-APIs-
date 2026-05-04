@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.anuncio',
     'rest_framework',
     'django_filters',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -139,4 +140,11 @@ REST_FRAMEWORK = {
         'rest_framework.versioning.URLPathVersioning',
         'DEFAULT_VERSION': 'v1',
         'ALLOWED_VERSIONS': ['v1', 'v2'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication', ]
+}
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY,
+    'ALGORITHM': 'HS256',
 }
