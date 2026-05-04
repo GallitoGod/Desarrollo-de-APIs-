@@ -49,8 +49,8 @@ class AnuncioViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
-        usuario_defecto = Usuario.objects.first()
-        serializer.save(publicado_por=usuario_defecto)
+        serializer.save(publicado_por=self.request.user)
+
 
     @action(detail=True, methods=['get'])
     def tiempo_restante(self, request, pk=None):

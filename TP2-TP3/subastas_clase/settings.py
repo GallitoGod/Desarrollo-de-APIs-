@@ -136,15 +136,18 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
-    'DEFAULT_VERSIONING_CLASS':
-        'rest_framework.versioning.URLPathVersioning',
-        'DEFAULT_VERSION': 'v1',
-        'ALLOWED_VERSIONS': ['v1', 'v2'],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication', ],
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',] 
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 
 SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
