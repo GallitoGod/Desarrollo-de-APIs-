@@ -6,5 +6,7 @@ class Usuario(AbstractUser):
     documento_identidad = models.CharField(max_length=15, verbose_name='Número de documento', unique=True)
     domicilio = models.CharField(max_length=250)
 
+    REQUIRED_FIELDS = ['documento_identidad', 'domicilio']
+
     def __str__(self):
         return f'{self.username}'
