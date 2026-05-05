@@ -10,6 +10,7 @@ from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import CategoriaFilter, AnuncioFilter
 from .pagination import StandardResultsSetPagination
+from rest_framework.exceptions import PermissionDenied
 
 class CategoriaListaGenericView(ListCreateAPIView):
     queryset = Categoria.objects.all()
@@ -50,6 +51,16 @@ class AnuncioViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(publicado_por=self.request.user)
+
+    def perform_update(self, serializer):
+        if serializer.instance.publicado_por != self.request.user:
+            raise PermissionDenied("No tienes permiso para modificar este anuncio.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.publicado_por != self.request.user:
+            raise PermissionDenied("No tienes permiso para eliminar este anuncio.")
+        instance.delete()
 
 
     @action(detail=True, methods=['get'])
@@ -149,10 +160,34 @@ class AnuncioListaAPIView(APIView):
     
 
 class AnuncioDetalleAPIView(APIView):
+    # Nota: También protegido automáticamente por settings.py
+
     def get(self, request, pk, format=None):
         anuncio = get_object_or_404(Anuncio, pk=pk)
         serializer = AnuncioSerializer(anuncio)
         return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        anuncio = get_object_or_404(Anuncio, pk=pk)
+        
+  
+        if anuncio.publicado_por != request.user:
+            raise PermissionDenied("No tienes permiso para modificar este anuncio.")
+            
+        serializer = AnuncioSerializer(anuncio, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        anuncio = get_object_or_404(Anuncio, pk=pk)
+        
+        if anuncio.publicado_por != request.user:
+            raise PermissionDenied("No tienes permiso para eliminar este anuncio.")
+            
+        anuncio.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request, pk, format=None):
         anuncio = get_object_or_404(Anuncio, pk=pk)
