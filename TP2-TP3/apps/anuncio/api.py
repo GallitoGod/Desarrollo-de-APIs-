@@ -2,7 +2,7 @@ from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIView, ListCreateAPIView
-from .models import Categoria, Anuncio
+from .models import Categoria, Anuncio, OfertaAnuncio
 from .serializers import CategoriaSerializer, AnuncioSerializer, CategoriaV2Serializer
 from apps.usuario.models import Usuario
 from rest_framework.decorators import action
@@ -11,6 +11,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import CategoriaFilter, AnuncioFilter
 from .pagination import StandardResultsSetPagination
 from rest_framework.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
+from decimal import Decimal
 
 class CategoriaListaGenericView(ListCreateAPIView):
     queryset = Categoria.objects.all()
@@ -93,6 +95,48 @@ class AnuncioViewSet(viewsets.ModelViewSet):
                 "minutos": minutos
             }
         })
+    
+    @action(detail=True, methods=['post'])
+    def ofertar(self, request, pk=None, **kwargs):
+        anuncio = self.get_object()
+        precio_enviado = request.data.get('precio_oferta')
+        precio_decimal = Decimal(str(precio_enviado))
+
+        if anuncio.publicado_por == request.user:
+            return Response({"error": "No se puede realizar ofertas a tu propio anuncio."}, status=status.HTTP_403_FORBIDDEN)
+
+        if not anuncio.activo:
+            return Response({"error": "Anuncio no activo."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if anuncio.fecha_fin < timezone.now():
+            return Response({"error": "El tiempo de la subasta ha finalizado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        
+        if not precio_enviado:
+            return Response(
+                {"error": "Debes incluir el campo 'precio_oferta' en tu petición."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            nueva_oferta = OfertaAnuncio(
+                anuncio=anuncio,
+                usuario=request.user,
+                precio_oferta=precio_decimal
+            )
+            
+            nueva_oferta.clean() 
+            nueva_oferta.save()
+
+            return Response({
+                "mensaje": "Oferta registrada exitosamente.",
+                "oferta_id": nueva_oferta.id,
+                "precio_ofertado": nueva_oferta.precio_oferta
+            }, status=status.HTTP_201_CREATED)
+
+        except ValidationError as e:
+            return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
