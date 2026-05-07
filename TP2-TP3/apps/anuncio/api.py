@@ -204,7 +204,6 @@ class AnuncioListaAPIView(APIView):
     
 
 class AnuncioDetalleAPIView(APIView):
-    # Nota: También protegido automáticamente por settings.py
 
     def get(self, request, pk, format=None):
         anuncio = get_object_or_404(Anuncio, pk=pk)
