@@ -1,5 +1,5 @@
 from rest_framework import routers
-from apps.anuncio.api import CategoriaViewSet, AnuncioViewSet
+from apps.anuncio.api.views import CategoriaViewSet, AnuncioViewSet
 from django.urls import path, include
 
 router = routers.DefaultRouter()

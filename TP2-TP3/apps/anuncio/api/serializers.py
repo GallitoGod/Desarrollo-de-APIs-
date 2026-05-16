@@ -1,15 +1,12 @@
 from rest_framework import serializers
-from .models import Categoria, Anuncio
+from apps.anuncio.models import Anuncio, Categoria
 from django.utils import timezone
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
-        fields = [
-            'id',
-            'nombre',
-            'activa',
-        ]
+        fields = ['uuid', 'nombre', 'activa',]
+        read_only_fields = ['uuid']
 
     def validate_nombre(self, value):
         if len(value) < 3:
@@ -29,12 +26,8 @@ class AnuncioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Anuncio
-        fields = [
-            'id', 'titulo', 'descripcion', 'precio_inicial', 
-            'imagen', 'fecha_inicio', 'fecha_fin', 'activo', 
-            'categorias', 'publicado_por', 'oferta_ganadora'
-        ]
-        read_only_fields = ['publicado_por', 'oferta_ganadora']
+        fields = ['uuid', 'titulo', 'descripcion', 'precio_inicial', 'fecha_inicio', 'fecha_fin', 'activo', 'categorias', 'publicado_por']
+        read_only_fields = ['publicado_por', 'uuid']
 
 
 

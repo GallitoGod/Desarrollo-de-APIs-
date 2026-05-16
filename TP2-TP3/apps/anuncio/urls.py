@@ -1,5 +1,5 @@
 from django.urls import path
-from .api import CategoriaListaAPIView, CategoriaDetalleAPIView, AnuncioListaAPIView, AnuncioDetalleAPIView, CategoriaListaGenericView, CategoriaDetalleGenericView
+from .api.views import CategoriaListaAPIView, CategoriaDetalleAPIView, AnuncioListaAPIView, AnuncioDetalleAPIView, CategoriaListaGenericView, CategoriaDetalleGenericView
 
 app_name = 'anuncio'
 

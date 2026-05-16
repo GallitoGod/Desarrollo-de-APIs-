@@ -2,27 +2,17 @@ from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404, RetrieveUpdateDestroyAPIView, ListCreateAPIView
-from .models import Categoria, Anuncio, OfertaAnuncio
+from apps.anuncio.models import Categoria, Anuncio, OfertaAnuncio
 from .serializers import CategoriaSerializer, AnuncioSerializer, CategoriaV2Serializer
 from apps.usuario.models import Usuario
 from rest_framework.decorators import action
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import CategoriaFilter, AnuncioFilter
-from .pagination import StandardResultsSetPagination
+from apps.anuncio.filters import CategoriaFilter, AnuncioFilter
+from apps.anuncio.pagination import StandardResultsSetPagination
 from rest_framework.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from decimal import Decimal
-
-class CategoriaListaGenericView(ListCreateAPIView):
-    queryset = Categoria.objects.all()
-    serializer_class = CategoriaSerializer
-
-
-class CategoriaDetalleGenericView(RetrieveUpdateDestroyAPIView):
-    queryset = Categoria.objects.all()
-    serializer_class = CategoriaSerializer
-
 
 
 
@@ -35,6 +25,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     filterset_class = CategoriaFilter
     ordering_fields = ['nombre', 'activa']
     pagination_class = StandardResultsSetPagination
+    lookup_field = 'uuid'
 
     def get_serializer_class(self):
         if self.request.version == 'v2':
@@ -49,6 +40,7 @@ class AnuncioViewSet(viewsets.ModelViewSet):
     filterset_class = AnuncioFilter
     ordering_fields = ['titulo']
     pagination_class = StandardResultsSetPagination
+    lookup_field = 'uuid'
 
 
     def perform_create(self, serializer):
@@ -180,6 +172,7 @@ class CategoriaDetalleAPIView(APIView):
         categoria.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
 class AnuncioListaAPIView(APIView):
     def get(self, request, format=None):
         anuncios = Anuncio.objects.all()
@@ -244,3 +237,13 @@ class AnuncioDetalleAPIView(APIView):
         anuncio = get_object_or_404(Anuncio, pk=pk)
         anuncio.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class CategoriaListaGenericView(ListCreateAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaDetalleGenericView(RetrieveUpdateDestroyAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
