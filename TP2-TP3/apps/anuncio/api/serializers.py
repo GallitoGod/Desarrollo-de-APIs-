@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from apps.anuncio.models import Anuncio, Categoria
 from django.utils import timezone
+from .utils import cotizar_usd
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,11 +24,12 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
 class AnuncioSerializer(serializers.ModelSerializer):
     categorias = serializers.PrimaryKeyRelatedField(queryset=Categoria.objects.all(), many=True)
+    precio_usd = serializers.SerializerMethodField()
 
     class Meta:
         model = Anuncio
-        fields = ['uuid', 'titulo', 'descripcion', 'precio_inicial', 'fecha_inicio', 'fecha_fin', 'activo', 'categorias', 'publicado_por']
-        read_only_fields = ['publicado_por', 'uuid']
+        fields = ['uuid', 'titulo', 'descripcion', 'precio_inicial', 'precio_usd', 'fecha_inicio', 'fecha_fin', 'activo', 'categorias', 'publicado_por']
+        read_only_fields = ['publicado_por', 'uuid', 'precio_usd']
 
 
 
@@ -51,6 +53,14 @@ class AnuncioSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"fecha_fin": "La fecha de finalización debe ser posterior a la fecha de inicio"})
         return data
     
+    def get_precio_usd(self, obj):
+        
+        tasa = cotizar_usd()
+        
+        if tasa and obj.precio_inicial:
+            precio_usd = float(obj.precio_inicial) * tasa
+            return round(precio_usd, 2)
+        return "No disponible temporalmente"
 
 class CategoriaV2Serializer(serializers.ModelSerializer):
     class Meta:

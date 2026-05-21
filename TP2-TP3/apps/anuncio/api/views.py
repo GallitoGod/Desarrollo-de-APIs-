@@ -16,6 +16,7 @@ from decimal import Decimal
 
 
 
+
 #     --------        ViewSets     -------------
 
 class CategoriaViewSet(viewsets.ModelViewSet):
